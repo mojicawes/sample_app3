@@ -1,0 +1,135 @@
+# Handy-dandy project setup instructions
+
+#From the file menu New -> rails project (check generate own code)
+
+#Now change to the project directory or all is lost!
+
+#Now create the rails project without the test directory so we can use rspec
+rails new . -T
+
+#Now set up the local and remote repositories
+git init
+git add .
+git commit -m "Initial commit"
+
+git remote add origin git@github.com:cs4413/sample_app3.git
+git push -u origin master
+
+
+# Now replace the Gemfile with the Gemfile in github.com/cs4413/sample_app3
+
+# Edit the README file to indicate what this project is about
+
+# Need to be sure to bundle install after changing Gemfile
+bundle install 
+
+# Now save the changes to all the repositories
+git add .
+git commit -m "Updated Gemfile"
+git push
+
+# Start the rails server and make sure everything is running (change to project directory):
+rails server
+
+# Start a browser and look at the page http://localhost:3000
+
+
+# Should do this before creating any pages
+rails generate rspec:install 
+
+# The previous step should generate several spec directories including spec_helper.rb. 
+# If you don't see them try F5 to refresh.  If you still don't see them, make sure they 
+# are really there by looking using Windows Explorer.  If the spec/ directory has been 
+# generated then go to the tiny down triangle on the App Explorer tab on the left. Choose
+# customize view.  Believe it or not it is sometimes set to filter out project files by
+# default...just uncheck this box.
+
+# Just to make sure that everything is saved
+git add .
+git commit -m "Installed rspec"
+git push
+
+# Create home and contact pages
+rails generate controller Pages home contact
+
+# Look in your browser at http://localhost:3000/pages/home to make sure they are there
+
+# Save the changes before going on
+git add .
+git commit -m "Added home and contact page"
+git push
+
+# Get rid of some of the extra test cases so you don't get "pending" messages
+git rm -r spec/views
+git rm -r spec/helpers
+
+# Save the changes before going on
+git add .
+git commit -m "Got rid of spec tests in views and helpers"
+git push
+
+# Run the tests and see if they fail (they shouldn't)
+bundle exec rspec spec/ 
+
+# The previous step will take a long time --- we are going to fix this by using Spork.
+# Use use the bundle exec in front of the rspec to make sure that all the gems are available.
+
+# Now we are going to install spork to speed up tests (It was already in Gemfile so should be bundled)
+# On the File menu do File -> Open File to open .rspec in the project root directory
+
+
+# Add the followling line to the .rspec file:
+ --drb
+
+
+# Edit the spec/spec_helper.rb file as follows:
+
+#1) put the following line at the top:
+require 'spork'
+
+#2) put all the rest of the code inside the following:
+
+Spork.prefork do
+   ....
+end
+
+# Start spork in the project root directory and detach this terminal
+bundle exec spork
+
+# Try the tests again
+bundle exec rspec spec/
+
+# The tests will be run under the spork server (which is a worker pool).
+# The first time it runs under spork it will be slow, but the next
+# time it will be very fast.
+
+# As usual save everything to make sure
+git add .
+git commit -m "Making sure all our spork stuff is saved"
+git push
+
+------------------------------------------------------------------
+# The next step deploys to Heroku.... Make sure you have a heroku account.
+
+# Install heroku --- make sure you are in root directory of project
+gem install heroku     
+
+# You might get some error messages about documentation on rest client - ignore it
+
+# Make sure your public keys are in your home directory in the .ssh subdirectory
+heroku keys:add              # You will be asked for you heroku account info
+
+# Now create a deployment on Heroku for your project:
+heroku create --stack cedar
+
+# You will see a link on heroku.... open that link in another browser window
+
+# Deploy to heroku
+git push heroku master
+
+# Check to make sure that the pages are there by looking at the pages/home URL relative to
+# the heroku link
+
+
+
+
